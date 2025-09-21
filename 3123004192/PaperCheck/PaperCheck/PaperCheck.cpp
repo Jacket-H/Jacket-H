@@ -37,14 +37,15 @@ std::string ReadFile(std::string filePath)
 std::string StringPreprocessing(std::string data)
 {
 	std::string res;
-	for (int i = 0; i < data.size(); i++) 
+	for (size_t i = 0; i < data.size(); i++) 
 	{
 		unsigned char uc = static_cast<unsigned char>(data[i]);
 
 		// 处理ASCII字符
 		if (uc <= 127) 
 		{
-			if (isalnum(uc)) {
+			if (isalnum(uc)) 
+			{
 				res += tolower(uc);
 			}
 		}
@@ -82,20 +83,50 @@ std::string StringPreprocessing(std::string data)
 	}
 	return res;
 }
+//对文本进行分割
+std::vector<std::string> SplitUTF8Chars(const std::string& text) 
+{
+	std::vector<std::string> result;
+	for (size_t i = 0; i < text.size();) 
+	{
+		unsigned char c = static_cast<unsigned char>(text[i]);
+		size_t charLen = 1;
+		if ((c & 0x80) == 0) 
+		{
+			//英文/数字 (ASCII)
+			charLen = 1;
+		}
+		else if ((c & 0xE0) == 0xC0) 
+		{
+			//2字节字符
+			charLen = 2;
+		}
+		else if ((c & 0xF0) == 0xE0) 
+		{
+			//3字节字符
+			charLen = 3;
+		}
+		else if ((c & 0xF8) == 0xF0) 
+		{
+			//4字节字符
+			charLen = 4;
+		}
+
+		result.push_back(text.substr(i, charLen));
+		i += charLen;
+	}
+	return result;
+}
 
 //相似度计算模块
 //词（字）频计算
 double WordFrequencyCalculation()
 {
 	//将字的出现次数计入map中
-	for (int i = 0; i < paperA.size(); i++)
-	{
-		std::string s = paperA.substr(i, 1);
+	for (auto& s : SplitUTF8Chars(paperA)) {
 		mapA[s]++;
 	}
-	for (int i = 0; i < paperB.size(); i++)
-	{
-		std::string s = paperB.substr(i, 1);
+	for (auto& s : SplitUTF8Chars(paperB)) {
 		mapB[s]++;
 	}
 
@@ -114,7 +145,7 @@ double WordFrequencyCalculation()
 	}
 	//余弦计算
 	double dotProduct = 0.0, norm1 = 0.0, norm2 = 0.0;
-	for (int i = 0; i < allWords.size(); i++)
+	for (size_t i = 0; i < allWords.size(); i++)
 	{
 		dotProduct += vec1[i] * vec2[i];
 		norm1 += vec1[i] * vec1[i];
@@ -160,7 +191,7 @@ int main(int argc, char *argv[])
 	//文件路径
 	std::string filePathA, filePathB, filePathC;
 	filePathA = "orig.txt";
-	filePathB = "orig_add.txt";
+	filePathB = "orig_0.8_x.txt";
 	filePathC = "output.txt";
 	
 	//从命令行参数中传入文件路径
@@ -190,13 +221,15 @@ int main(int argc, char *argv[])
 	//测试是否能输入
 	//message += dataA + "\n" + dataB;
 	//测试是否能预处理
-	//message += paperA + "\n" + paperB;
+	message += paperA + "\n" + paperB + "\n";
 	//重复率输出
 	std::ostringstream ansOstring;
 	std::string ansString;
 	ansOstring << std::fixed << std::setprecision(2) << SimilarityCalculation()*100.0;	//保留两位小数
 	ansString = ansOstring.str();
-	message += "重复率计算结果：" + ansString + "%";
+	message += u8"原论文:" + filePathA + "\n";
+	message += u8"检查论文" + filePathB + "\n";
+	message += u8"重复率计算结果：" + ansString + "%";
 
 	//输出
 	Output(filePathC, message);
