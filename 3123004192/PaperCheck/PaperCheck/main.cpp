@@ -11,6 +11,7 @@
 std::unordered_map<std::string, int>mapA, mapB;
 std::unordered_set<std::string>setA;
 std::string message, paperA, paperB;
+std::vector<std::string> charsA, charsB;
 
 //输入模块
 std::string ReadFile(std::string filePath)
@@ -123,10 +124,12 @@ std::vector<std::string> SplitUTF8Chars(const std::string& text)
 double WordFrequencyCalculation()
 {
 	//将字的出现次数计入map中
-	for (auto& s : SplitUTF8Chars(paperA)) {
+	for (auto& s : charsA) 
+	{
 		mapA[s]++;
 	}
-	for (auto& s : SplitUTF8Chars(paperB)) {
+	for (auto& s : charsB) 
+	{
 		mapB[s]++;
 	}
 
@@ -162,40 +165,81 @@ double HashRollingCalculation()
 	int N = 5;	//N-Gram，长度为5
 	long long base = 1315423911;
 	long long mod = 1000000007;
-	//取得字符串
-	std::vector<std::string> charsA = SplitUTF8Chars(paperA);
-	std::vector<std::string> charsB = SplitUTF8Chars(paperB);
 
 	if ((int)charsA.size() < N || (int)charsB.size() < N) return 0.0;
 
-	//生成N-Gram哈希集合
-	std::unordered_set<long long>setA, setB;
-	for (size_t i = 0; i + N <= charsA.size(); i++)
+	//预计算base^(N-1)
+	long long power = 1;
+	for (int i = 0; i < N - 1; i++)
 	{
-		long long h = 0;
-		for (int j = 0; j < N; j++)
-		{
-			std::string& token = charsA[i + j];
-			for (char c : token)
-			{
-				h = (h * base%mod + (long long)c) % mod;
-			}
-		}
-		setA.insert(h);
+		power = (power*base) % mod;
 	}
 
-	for (size_t i = 0; i + N <= charsB.size(); i++)
+	//生成N-Gram哈希集合
+	std::unordered_set<long long> setA, setB;
+	//A
+	if (!charsA.empty() && charsA.size() >= N) 
 	{
-		long long h = 0;
+		// 计算第一个N-Gram的哈希
+		long long currentHash = 0;
 		for (int j = 0; j < N; j++)
 		{
-			std::string& token = charsB[i + j];
-			for (char c : token)
+			for (char c : charsA[j]) 
 			{
-				h = (h * base%mod + (long long)c) % mod;
+				currentHash = (currentHash * base + static_cast<unsigned char>(c)) % mod;
 			}
 		}
-		setB.insert(h);
+		setA.insert(currentHash);
+
+		// 使用滚动哈希计算后续的N-Gram
+		for (size_t i = 1; i + N <= charsA.size(); i++) 
+		{
+			// 移除前一个字符的贡献
+			for (char c : charsA[i - 1]) 
+			{
+				currentHash = (currentHash - static_cast<unsigned char>(c) * power % mod + mod) % mod;
+			}
+
+			// 添加新字符的贡献
+			for (char c : charsA[i + N - 1]) 
+			{
+				currentHash = (currentHash * base + static_cast<unsigned char>(c)) % mod;
+			}
+
+			setA.insert(currentHash);
+		}
+	}
+	//B
+	if (!charsB.empty() && charsB.size() >= N)
+	{
+		// 计算第一个N-Gram的哈希
+		long long currentHash = 0;
+		for (int j = 0; j < N; j++)
+		{
+			for (char c : charsB[j])
+			{
+				currentHash = (currentHash * base + static_cast<unsigned char>(c)) % mod;
+			}
+		}
+		setB.insert(currentHash);
+
+		// 使用滚动哈希计算后续的N-Gram
+		for (size_t i = 1; i + N <= charsB.size(); i++)
+		{
+			// 移除前一个字符的贡献
+			for (char c : charsB[i - 1])
+			{
+				currentHash = (currentHash - static_cast<unsigned char>(c) * power % mod + mod) % mod;
+			}
+
+			// 添加新字符的贡献
+			for (char c : charsB[i + N - 1])
+			{
+				currentHash = (currentHash * base + static_cast<unsigned char>(c)) % mod;
+			}
+
+			setB.insert(currentHash);
+		}
 	}
 
 	//计算Jaccard相似度
@@ -212,6 +256,10 @@ double HashRollingCalculation()
 //相似度统计
 double SimilarityCalculation()
 {
+	//取得字符串
+	charsA = SplitUTF8Chars(paperA);
+	charsB = SplitUTF8Chars(paperB);
+
 	double ans=0.0;
 	ans += 0.5*WordFrequencyCalculation();
 	ans += 0.5*HashRollingCalculation();
@@ -239,7 +287,7 @@ int main(int argc, char *argv[])
 	//文件路径
 	std::string filePathA, filePathB, filePathC;
 	filePathA = "orig.txt";
-	filePathB = "orig_0.8_x.txt";
+	filePathB = "orig_0.8_add.txt";
 	filePathC = "output.txt";
 	
 	//从命令行参数中传入文件路径
