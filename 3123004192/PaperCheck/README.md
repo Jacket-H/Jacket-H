@@ -5,15 +5,15 @@
 
 Github链接：<https://github.com/Jacket-H/Jacket-H>
 作业Releases链接：<https://github.com/Jacket-H/Jacket-H/releases/tag/v1.0.0>
-
-### 模块设计
+<br>
+###模块设计
 主要可分为以下四个模块：
 * 输入模块：负责从文件中读取论文的部分
 * 预处理模块：去除论文的空格、标点、换行符，并将所有大写转换为小写后，进行分词
 * 相似度计算：采用词频向量检查和哈希检查的混合方式，计算重复率
 * 输出模块：将结果输出至文件
-
-### 模块接口设计
+<br>
+###模块接口设计
 - `main(int argc, char *argv[])`链接所有函数，并读取命令行参数
 #### 输入模块
 - `ReadFile(std::string filePath)`从文件中读取论文，输出string字符串
@@ -43,11 +43,11 @@ Github链接：<https://github.com/Jacket-H/Jacket-H>
 ![image](https://img2024.cnblogs.com/blog/3699281/202509/3699281-20250922020642180-1072380995.png)
 而进一步放大能够发现，在这两个核心算法中`std::Hash`和`SplitUTF8Chars(std::string &text)`分别占用了近35%和38%的性能消耗。
 可以发现有两个优化方向：
-1. 将哈希优化为滚动哈希
-2. 减少`SplitUTF8Chars(std::string &text)`的重复调用
-
-### 计算模块部分异常处理说明
-##### 文件读取异常
+1.将哈希优化为滚动哈希
+2.减少`SplitUTF8Chars(std::string &text)`的重复调用
+<br>
+###计算模块部分异常处理说明
+#####文件读取异常
 若是文件无法读取，则将输入空文件，并输出警告于输出文件中
 ##### 输入空文件
 原论文或抄袭版论文输入为空时，查重率将为零
