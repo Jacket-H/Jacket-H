@@ -1,0 +1,3 @@
+cd D:\Github\Jacket-H\3123004192\PaperCheck\Debug\ 
+
+main.exe orig.txt orig_0.8_add.txt output.txt
