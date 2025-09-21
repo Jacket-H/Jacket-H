@@ -1,6 +1,9 @@
 ﻿  PaperCheck.cpp
-d:\github\jacket-h\3123004192\papercheck\papercheck\papercheck.cpp(37): warning C4018: “<”: 有符号/无符号不匹配
-d:\github\jacket-h\3123004192\papercheck\papercheck\papercheck.cpp(49): warning C4018: “<”: 有符号/无符号不匹配
-d:\github\jacket-h\3123004192\papercheck\papercheck\papercheck.cpp(71): warning C4018: “<”: 有符号/无符号不匹配
-d:\github\jacket-h\3123004192\papercheck\papercheck\papercheck.cpp(75): warning C4018: “<”: 有符号/无符号不匹配
+d:\github\jacket-h\3123004192\papercheck\papercheck\papercheck.cpp(40): warning C4018: “<”: 有符号/无符号不匹配
+d:\github\jacket-h\3123004192\papercheck\papercheck\papercheck.cpp(52): warning C4018: “<”: 有符号/无符号不匹配
+d:\github\jacket-h\3123004192\papercheck\papercheck\papercheck.cpp(74): warning C4018: “<”: 有符号/无符号不匹配
+d:\github\jacket-h\3123004192\papercheck\papercheck\papercheck.cpp(78): warning C4018: “<”: 有符号/无符号不匹配
+d:\github\jacket-h\3123004192\papercheck\papercheck\papercheck.cpp(91): warning C4018: “<”: 有符号/无符号不匹配
+d:\github\jacket-h\3123004192\papercheck\papercheck\papercheck.cpp(96): warning C4018: “<”: 有符号/无符号不匹配
+d:\github\jacket-h\3123004192\papercheck\papercheck\papercheck.cpp(117): warning C4018: “<”: 有符号/无符号不匹配
   PaperCheck.vcxproj -> D:\Github\Jacket-H\3123004192\PaperCheck\Debug\PaperCheck.exe

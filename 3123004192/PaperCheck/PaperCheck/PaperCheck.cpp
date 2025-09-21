@@ -1,9 +1,12 @@
 ﻿#include <iostream>
-#include<fstream>
-#include<unordered_map>
-#include<unordered_set>
-#include <map>
+#include <fstream>
+#include <sstream>
 #include <string>
+#include <unordered_map>
+#include <unordered_set>
+#include <map>
+#include <cmath>
+#include <iomanip>
 
 std::unordered_map<std::string, int>mapA, mapB;
 std::unordered_set<std::string>setA;
@@ -84,17 +87,56 @@ std::string StringPreprocessing(std::string data)
 //词（字）频计算
 double WordFrequencyCalculation()
 {
+	//将字的出现次数计入map中
+	for (int i = 0; i < paperA.size(); i++)
+	{
+		std::string s = paperA.substr(i, 1);
+		mapA[s]++;
+	}
+	for (int i = 0; i < paperB.size(); i++)
+	{
+		std::string s = paperB.substr(i, 1);
+		mapB[s]++;
+	}
 
-	return 1.0;
+	if (mapA.empty() || mapB.empty()) return 0.0;
+
+	//统计所有词汇（字）
+	std::unordered_set<std::string>allWords;
+	for (auto i : mapA) allWords.insert(i.first);
+	for (auto i : mapB) allWords.insert(i.first);
+	//创建频率向量
+	std::vector<double> vec1, vec2;
+	for (auto i : allWords)
+	{
+		vec1.push_back(mapA.count(i) ? mapA.at(i) : 0);
+		vec2.push_back(mapB.count(i) ? mapB.at(i) : 0);
+	}
+	//余弦计算
+	double dotProduct = 0.0, norm1 = 0.0, norm2 = 0.0;
+	for (int i = 0; i < allWords.size(); i++)
+	{
+		dotProduct += vec1[i] * vec2[i];
+		norm1 += vec1[i] * vec1[i];
+		norm2 += vec2[i] * vec2[i];
+	}
+	norm1 = std::sqrt(norm1);
+	norm2 = std::sqrt(norm2);
+	if (!norm1 || !norm2) return 0.0;
+	return dotProduct / (norm1*norm2);
 }
 //哈希滚动计算
 double HashRollingCalculation()
 {
 	return 1.0;
 }
+//相似度统计
 double SimilarityCalculation()
 {
-	return 1.0;
+	double ans=0.0;
+	ans += 1.0*WordFrequencyCalculation();
+	ans += 0.0*HashRollingCalculation();
+	return ans;
 }
 
 //输出模块
@@ -148,7 +190,13 @@ int main(int argc, char *argv[])
 	//测试是否能输入
 	//message += dataA + "\n" + dataB;
 	//测试是否能预处理
-	message += paperA + "\n" + paperB;
+	//message += paperA + "\n" + paperB;
+	//重复率输出
+	std::ostringstream ansOstring;
+	std::string ansString;
+	ansOstring << std::fixed << std::setprecision(2) << SimilarityCalculation()*100.0;	//保留两位小数
+	ansString = ansOstring.str();
+	message += "重复率计算结果：" + ansString + "%";
 
 	//输出
 	Output(filePathC, message);
